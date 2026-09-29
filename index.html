@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calotrak</title>
+  <style>
+    :root {
+      --bg: #efeae2;
+      --ink: #1a1814;
+      --muted: #6f675e;
+      --line: #ddd6cc;
+      --card: #faf8f5;
+      --accent: #b5522a;
+      --over: #8c3a2f;
+      --shadow: 0 18px 40px rgba(40, 28, 16, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 50% -10%, #f7f3ec 0%, transparent 60%),
+        var(--bg);
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(440px, calc(100% - 32px));
+      margin: 48px auto 64px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Palatino, "Palatino Linotype", Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 28px 24px 8px;
+    }
+
+    .hero {
+      text-align: center;
+      padding-bottom: 8px;
+    }
+
+    .remaining {
+      margin: 0;
+      font-family: Palatino, "Palatino Linotype", Georgia, serif;
+      font-size: 4.25rem;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .remaining.over { color: var(--over); }
+
+    .remaining-label {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .meter {
+      height: 6px;
+      margin: 22px 0 18px;
+      background: #e7e1d8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--ink);
+      border-radius: inherit;
+    }
+
+    .meter.over > span { background: var(--over); }
+
+    .goal-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .goal-row label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+
+    input {
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    input:focus {
+      outline: 2px solid #1a181433;
+      border-color: #b9b0a4;
+    }
+
+    #goal {
+      width: 5.5rem;
+      padding: 6px 8px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 88px auto;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    #name, #calories {
+      padding: 12px 12px;
+      min-width: 0;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: 0;
+      border-radius: 10px;
+      background: var(--ink);
+      color: #faf8f5;
+      padding: 0 16px;
+    }
+
+    button:hover { background: #2c2823; }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .log {
+      list-style: none;
+      margin: 18px -24px 0;
+      padding: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .log li {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .log li:last-child { border-bottom: 0; }
+
+    .food {
+      min-width: 0;
+    }
+
+    .food strong {
+      display: block;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .food span {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .kcal {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .remove {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .remove:hover {
+      background: #f1ebe3;
+      color: var(--over);
+    }
+
+    .empty {
+      margin: 8px 0 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .note {
+      margin: 16px 4px 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      form { grid-template-columns: 1fr 76px auto; }
+      .remaining { font-size: 3.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Calotrak</h1>
+      <p class="date" id="today"></p>
+    </header>
+
+    <section class="card">
+      <div class="hero">
+        <p class="remaining" id="remaining">0</p>
+        <p class="remaining-label" id="remaining-label">left today</p>
+      </div>
+      <div class="meter" id="meter" aria-hidden="true"><span id="meter-fill"></span></div>
+      <div class="goal-row">
+        <span id="eaten">0 eaten</span>
+        <label>
+          Daily goal
+          <input id="goal" type="number" min="1" step="1" inputmode="numeric" value="2000" aria-label="Daily calorie goal" />
+        </label>
+      </div>
+
+      <form id="add-form">
+        <input id="name" type="text" placeholder="What did you eat?" maxlength="80" required autocomplete="off" />
+        <input id="calories" type="number" min="1" step="1" inputmode="numeric" placeholder="kcal" required aria-label="Calories" />
+        <button type="submit">Add</button>
+      </form>
+
+      <p class="empty" id="empty">Nothing logged yet.</p>
+      <ul class="log" id="log"></ul>
+    </section>
+
+    <p class="note">Saved in this browser. Nothing leaves your machine.</p>
+  </main>
+
+  <script>
+    const KEY = "calotrak";
+    const todayKey = localDateKey();
+
+    const els = {
+      today: document.getElementById("today"),
+      remaining: document.getElementById("remaining"),
+      remainingLabel: document.getElementById("remaining-label"),
+      meter: document.getElementById("meter"),
+      meterFill: document.getElementById("meter-fill"),
+      eaten: document.getElementById("eaten"),
+      goal: document.getElementById("goal"),
+      form: document.getElementById("add-form"),
+      name: document.getElementById("name"),
+      calories: document.getElementById("calories"),
+      empty: document.getElementById("empty"),
+      log: document.getElementById("log"),
+    };
+
+    els.today.textContent = new Date().toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+
+    let state = load();
+    els.goal.value = state.goal;
+    render();
+    els.name.focus();
+
+    els.goal.addEventListener("change", () => {
+      const next = Math.round(Number(els.goal.value));
+      if (!Number.isFinite(next) || next < 1) {
+        els.goal.value = state.goal;
+        return;
+      }
+      state.goal = next;
+      save();
+      render();
+    });
+
+    els.form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = els.name.value.trim();
+      const calories = Math.round(Number(els.calories.value));
+      if (!name || !Number.isFinite(calories) || calories < 1) return;
+
+      entries().push({
+        id: crypto.randomUUID(),
+        name,
+        calories,
+        at: new Date().toISOString(),
+      });
+      save();
+      els.form.reset();
+      render();
+      els.name.focus();
+    });
+
+    els.log.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-id]");
+      if (!button) return;
+      state.entries[todayKey] = entries().filter((item) => item.id !== button.dataset.id);
+      save();
+      render();
+    });
+
+    function localDateKey(date = new Date()) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function load() {
+      try {
+        const data = JSON.parse(localStorage.getItem(KEY));
+        if (!data || typeof data !== "object") return fresh();
+        const goal = Math.round(Number(data.goal));
+        return {
+          goal: Number.isFinite(goal) && goal > 0 ? goal : 2000,
+          entries: data.entries && typeof data.entries === "object" ? data.entries : {},
+        };
+      } catch {
+        return fresh();
+      }
+    }
+
+    function fresh() {
+      return { goal: 2000, entries: {} };
+    }
+
+    function entries() {
+      if (!Array.isArray(state.entries[todayKey])) state.entries[todayKey] = [];
+      return state.entries[todayKey];
+    }
+
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    }
+
+    function render() {
+      const list = entries();
+      const eaten = list.reduce((sum, item) => sum + item.calories, 0);
+      const left = state.goal - eaten;
+      const over = left < 0;
+
+      els.remaining.textContent = format(Math.abs(left));
+      els.remaining.classList.toggle("over", over);
+      els.remainingLabel.textContent = over ? "over today" : "left today";
+      els.eaten.textContent = `${format(eaten)} eaten`;
+
+      const pct = state.goal > 0 ? Math.min(100, (eaten / state.goal) * 100) : 0;
+      els.meterFill.style.width = `${pct}%`;
+      els.meter.classList.toggle("over", over);
+
+      els.empty.hidden = list.length > 0;
+      els.log.innerHTML = "";
+
+      for (const item of [...list].reverse()) {
+        const li = document.createElement("li");
+        const food = document.createElement("div");
+        food.className = "food";
+        const name = document.createElement("strong");
+        name.textContent = item.name;
+        const time = document.createElement("span");
+        time.textContent = new Date(item.at).toLocaleTimeString(undefined, {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+        food.append(name, time);
+
+        const kcal = document.createElement("span");
+        kcal.className = "kcal";
+        kcal.textContent = format(item.calories);
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "remove";
+        remove.dataset.id = item.id;
+        remove.setAttribute("aria-label", `Remove ${item.name}`);
+        remove.textContent = "×";
+
+        li.append(food, kcal, remove);
+        els.log.append(li);
+      }
+    }
+
+    function format(n) {
+      return new Intl.NumberFormat().format(n);
+    }
+  </script>
+</body>
+</html>
