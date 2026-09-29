@@ -61,6 +61,27 @@
       padding: 28px 24px 8px;
     }
 
+    .person {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .person label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    #person {
+      width: 100%;
+      padding: 12px 12px;
+    }
+
     .hero {
       text-align: center;
       padding-bottom: 8px;
@@ -257,6 +278,10 @@
     </header>
 
     <section class="card">
+      <div class="person">
+        <label for="person">Person</label>
+        <input id="person" type="text" placeholder="Enter a name" maxlength="60" autocomplete="name" />
+      </div>
       <div class="hero">
         <p class="remaining" id="remaining">0</p>
         <p class="remaining-label" id="remaining-label">left today</p>
@@ -295,6 +320,7 @@
       meterFill: document.getElementById("meter-fill"),
       eaten: document.getElementById("eaten"),
       goal: document.getElementById("goal"),
+      person: document.getElementById("person"),
       form: document.getElementById("add-form"),
       name: document.getElementById("name"),
       calories: document.getElementById("calories"),
@@ -310,8 +336,22 @@
 
     let state = load();
     els.goal.value = state.goal;
+    els.person.value = state.person;
     render();
-    els.name.focus();
+    (state.person ? els.name : els.person).focus();
+
+    els.person.addEventListener("input", () => {
+      state.person = els.person.value;
+      save();
+      render();
+    });
+
+    els.person.addEventListener("blur", () => {
+      state.person = els.person.value.trim();
+      els.person.value = state.person;
+      save();
+      render();
+    });
 
     els.goal.addEventListener("change", () => {
       const next = Math.round(Number(els.goal.value));
@@ -364,6 +404,7 @@
         const goal = Math.round(Number(data.goal));
         return {
           goal: Number.isFinite(goal) && goal > 0 ? goal : 2000,
+          person: typeof data.person === "string" ? data.person : "",
           entries: data.entries && typeof data.entries === "object" ? data.entries : {},
         };
       } catch {
@@ -372,7 +413,7 @@
     }
 
     function fresh() {
-      return { goal: 2000, entries: {} };
+      return { goal: 2000, person: "", entries: {} };
     }
 
     function entries() {
@@ -392,7 +433,10 @@
 
       els.remaining.textContent = format(Math.abs(left));
       els.remaining.classList.toggle("over", over);
-      els.remainingLabel.textContent = over ? "over today" : "left today";
+      const person = state.person.trim();
+      els.remainingLabel.textContent = person
+        ? (over ? `over today for ${person}` : `left today for ${person}`)
+        : (over ? "over today" : "left today");
       els.eaten.textContent = `${format(eaten)} eaten`;
 
       const pct = state.goal > 0 ? Math.min(100, (eaten / state.goal) * 100) : 0;
