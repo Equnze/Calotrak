@@ -66,12 +66,14 @@
       flex-direction: column;
       gap: 6px;
       margin-bottom: 22px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--line);
+      padding: 14px 14px 16px;
+      background: #e7f1fc;
+      border: 1px solid #9ec4ea;
+      border-radius: 12px;
     }
 
     .person label {
-      color: var(--muted);
+      color: #1d4f91;
       font-size: 0.78rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -80,6 +82,14 @@
     #person {
       width: 100%;
       padding: 12px 12px;
+      color: #1a4a86;
+      background: #f5f9ff;
+      border-color: #6aa4dc;
+    }
+
+    #person:focus {
+      outline-color: #1d4f9155;
+      border-color: #1d4f91;
     }
 
     .hero {
@@ -136,6 +146,11 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      color: #9b2330;
+      background: #fdecec;
+      border: 1px solid #f0b4b4;
+      border-radius: 10px;
+      padding: 6px 8px 6px 12px;
     }
 
     input[type="number"]::-webkit-outer-spin-button,
@@ -164,6 +179,14 @@
       padding: 6px 8px;
       text-align: right;
       font-variant-numeric: tabular-nums;
+      color: #9b2330;
+      background: #fff8f8;
+      border-color: #e07070;
+    }
+
+    #goal:focus {
+      outline-color: #9b233055;
+      border-color: #9b2330;
     }
 
     form {
